@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Homepage</title>
+  </head>
+  <body>
+    <%- include ('./partials/navbar') %> <% if (locals.user) {%> <%- include
+    ('./partials/folderIcon')%>
+    <form action="/upload" method="GET">
+      <input type="hidden" name="folderId" value="<%= folder.id %>" />
+      <button type="submit">Upload</button>
+    </form>
+    <h1><%= folder.name %></h1>
+
+    <button id="newFolderBtn">
+      <%- include ('./partials/addFolderIcon') %>
+    </button>
+    <form
+      id="newFolderForm"
+      action="/create-folder"
+      method="POST"
+      style="display: none"
+    >
+      <input type="text" name="folderName" placeholder="Folder name" required />
+      <input type="hidden" name="parentId" value="<%= folder.id %>" />
+      <button type="submit">Create</button>
+    </form>
+    <p>Subfolders:</p>
+    <ul>
+      <% folder.subfolders.forEach(subfolder => { %>
+      <li>
+        <a href="/folder/<%= subfolder.id %>"><%= subfolder.name %></a>
+      </li>
+      <% }) %>
+    </ul>
+    <p>Files:</p>
+    <ul>
+      <% folder.files.forEach(file => { %>
+      <li>
+        <a href="/file/<%= file.id %>"><%= file.filename %></a>
+      </li>
+      <% }) %>
+    </ul>
+
+    <script>
+      document
+        .getElementById("newFolderBtn")
+        .addEventListener("click", function () {
+          var form = document.getElementById("newFolderForm");
+          form.style.display =
+            form.style.display === "none" || form.style.display === ""
+              ? "block"
+              : "none";
+        });
+    </script>
+    <% } %>
+  </body>
+</html>

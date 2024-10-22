@@ -1,0 +1,15 @@
+<nav>
+    <% if (locals.user) {%>
+    <a href="/account/ %>"> <%= user.username %></a>
+    <a href="/log-out">Log Out</a>
+    <% } else { %>
+    <h1>Please log in or sign up <a href="/sign-up">here</a></h1>
+    <form action="/log-in" method="POST">
+      <label for="username">Username</label>
+      <input id="username" name="username" placeholder="username" type="text" />
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" />
+      <button>Log In</button>
+    </form>
+    <%}%>
+  </nav>

@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String   
+  expiresAt   DateTime
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  username String   @unique
+  email    String   @unique
+  password String
+  folders  Folder[] 
+}
+
+model Folder {
+  id         Int       @id @default(autoincrement())
+  name       String
+  parent     Folder?   @relation("Subfolders", fields: [parentId], references: [id])
+  parentId   Int?
+  subfolders Folder[]  @relation("Subfolders") // Relation for subfolders
+  files      File[]    
+  user       User      @relation(fields: [userId], references: [id])
+  userId     Int       
+  createdAt  DateTime  @default(now())
+}
+
+model File {
+  id        Int      @id @default(autoincrement())
+  filename  String
+  url       String   // The file path or URL (e.g., from Cloudinary)
+  mimetype  String   // File type (e.g., 'image/jpeg', 'application/pdf')
+  size      Int      // File size in bytes
+  folder    Folder?  @relation(fields: [folderId], references: [id])
+  folderId  Int?
+  uploadedAt DateTime @default(now())
+}
