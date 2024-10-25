@@ -1,6 +1,6 @@
 <nav>
     <% if (locals.user) {%>
-    <a href="/account/ %>"> <%= user.username %></a>
+    <a href="/"> <%= user.username %></a>
     <a href="/log-out">Log Out</a>
     <% } else { %>
     <h1>Please log in or sign up <a href="/sign-up">here</a></h1>

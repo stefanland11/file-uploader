@@ -13,33 +13,6 @@ const getIndex = async (req, res) => {
   });
 };
 
-const getFile = async (req, res) => {
-  file = await db.getFileInfo(parseInt(req.params.fileId), req.user.id);
-  res.render("file", {
-    user: req.user,
-    file: file,
-  });
-};
-
-const getFolder = async (req, res) => {
-  folder = await db.getFolderInfo(parseInt(req.params.folderId), req.user.id);
-  res.render("folder", {
-    user: req.user,
-    folder: folder,
-  });
-};
-
-const postCreateFolder = async (req, res) => {
-  const { folderName, parentId } = req.body;
-  const userId = req.user.id;
-  await db.newFolder(userId, parentId, folderName);
-
-  res.redirect("back");
-};
-
 module.exports = {
   getIndex,
-  getFile,
-  getFolder,
-  postCreateFolder,
 };

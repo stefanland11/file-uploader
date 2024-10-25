@@ -5,7 +5,7 @@ const { PrismaClient } = require("@prisma/client");
 const passport = require("./config/passport");
 const indexRouter = require("./routes/indexRouter");
 const userRouter = require("./routes/userRouter");
-const uploadRouter = require("./routes/uploadRouter");
+const fileRouter = require("./routes/fileRouter");
 
 const app = express();
 app.set("view engine", "ejs");
@@ -30,7 +30,7 @@ app.use(passport.session());
 
 app.use(indexRouter);
 app.use(userRouter);
-app.use(uploadRouter);
+app.use(fileRouter);
 
 app.post(
   "/log-in",

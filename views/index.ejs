@@ -5,16 +5,18 @@
     <title>Homepage</title>
   </head>
   <body>
-    <%- include ('./partials/navbar') %> <% if (locals.user) {%> <%- include
-    ('./partials/folderIcon')%>
+    <%- include ('./partials/navbar') %> <% if (locals.user) {%>
+    <h1>Main <%- include ('./partials/folderIcon')%></h1>
     <form action="/upload" method="GET">
       <input type="hidden" name="folderId" value="<%= folder.id %>" />
-      <button type="submit">Upload</button>
+      <button type="submit">Upload File</button>
     </form>
-    <h1>Main</h1>
-
+    <form id="deleteFolder" action="/delete-folder/" method="POST">
+      <input type="hidden" name="folderId" value="<%= folder.id %>" />
+      <button type="submit">Delete Current Folder</button>
+    </form>
     <button id="newFolderBtn">
-      <%- include ('./partials/addFolderIcon') %>
+      Create Subfolder
     </button>
     <form
       id="newFolderForm"

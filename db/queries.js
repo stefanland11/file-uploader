@@ -42,20 +42,21 @@ async function newFolder(userId, parentFolderId, folderName) {
   }
 }
 
-async function uploadFile(filename, url, type, size, folderId) {
+async function getFolderInfo(folderId, userId) {
   try {
-    const log = await prisma.file.create({
-      data: {
-        filename: filename,
-        url: url,
-        mimetype: type,
-        size: size,
-        folderId: folderId,
+    const folder = await prisma.folder.findUnique({
+      where: {
+        id: folderId,
+        userId: userId,
+      },
+      include: {
+        subfolders: true,
+        files: true,
       },
     });
-    console.log(log);
+    return folder;
   } catch (error) {
-    console.error("Error uploading file:", error);
+    console.error("Error fetching folder:", error);
     throw error;
   }
 }
@@ -96,7 +97,106 @@ async function getFileInfo(fileId, userId) {
   }
 }
 
-async function getFolderInfo(folderId, userId) {
+async function uploadFile(filename, url, type, size, folderId) {
+  try {
+    const log = await prisma.file.create({
+      data: {
+        filename: filename,
+        url: url,
+        mimetype: type,
+        size: size,
+        folderId: folderId,
+      },
+    });
+    console.log(log);
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    throw error;
+  }
+}
+
+async function updateFile(fileId, userId, fileName) {
+  try {
+    const file = await prisma.file.findUnique({
+      where: {
+        id: fileId,
+        folder: {
+          userId: userId,
+        },
+      },
+    });
+
+    if (!file) {
+      throw new Error("File not found or access denied.");
+    }
+    await prisma.file.update({
+      where: {
+        id: fileId,
+      },
+      data: {
+        filename: fileName,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating file:", error);
+    throw error;
+  }
+}
+
+async function updateFolder(folderId, userId, folderName) {
+  try {
+    const folder = await prisma.folder.findUnique({
+      where: {
+        id: folderId,
+        userId: userId,
+      },
+    });
+
+    if (!folder) {
+      throw new Error("Folder not found or access denied.");
+    }
+
+    await prisma.folder.update({
+      where: {
+        id: folderId,
+      },
+      data: {
+        name: folderName,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating folder name:", error);
+    throw error;
+  }
+}
+
+async function deleteFile(fileId, userId) {
+  try {
+    const file = await prisma.file.findUnique({
+      where: {
+        id: fileId,
+        folder: {
+          userId: userId,
+        },
+      },
+    });
+
+    if (!file) {
+      throw new Error("File not found or access denied.");
+    }
+
+    await prisma.file.delete({
+      where: {
+        id: fileId,
+      },
+    });
+  } catch (error) {
+    console.error("Error deleting file:", error);
+    throw error;
+  }
+}
+
+async function deleteFolder(folderId, userId) {
   try {
     const folder = await prisma.folder.findUnique({
       where: {
@@ -105,13 +205,42 @@ async function getFolderInfo(folderId, userId) {
       },
       include: {
         subfolders: true,
-        files: true,
       },
     });
-    return folder;
+
+    if (!folder) {
+      throw new Error("Folder not found or access denied.");
+    }
+
+    await deleteSubfolders(folder.subfolders);
+
+    await prisma.folder.delete({
+      where: {
+        id: folderId,
+      },
+    });
+
+    console.log(`Folder with ID ${folderId} deleted successfully.`);
   } catch (error) {
-    console.error("Error fetching folder:", error);
+    console.error("Error deleting folder:", error);
     throw error;
+  }
+}
+
+async function deleteSubfolders(subfolders) {
+  for (const subfolder of subfolders) {
+    const nestedSubfolders = await prisma.folder.findUnique({
+      where: { id: subfolder.id },
+      include: { subfolders: true },
+    });
+
+    if (nestedSubfolders) {
+      await deleteSubfolders(nestedSubfolders.subfolders);
+    }
+
+    await prisma.folder.delete({
+      where: { id: subfolder.id },
+    });
   }
 }
 
@@ -122,4 +251,8 @@ module.exports = {
   getMainFolder,
   getFileInfo,
   getFolderInfo,
+  updateFile,
+  updateFolder,
+  deleteFile,
+  deleteFolder,
 };

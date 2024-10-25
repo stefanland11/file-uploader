@@ -14,6 +14,15 @@
     <a href="<%= file.url %>" download="<%= file.filename %>">
       <button>Download File</button>
     </a>
+    <form id="updateFile" action="/update-file/" method="POST">
+      <input type="hidden" name="fileId" value="<%= file.id %>" />
+      <input id="filename" name="filename" placeholder="filename" type="text" />
+      <button type="submit">Rename File</button>
+    </form>
+    <form id="deleteFile" action="/delete-file/" method="POST">
+      <input type="hidden" name="fileId" value="<%= file.id %>" />
+      <button type="submit">Delete File</button>
+    </form>
     <a href="/folder/<%= file.folderId %>">Back to Folder</a>
   </body>
 </html>
